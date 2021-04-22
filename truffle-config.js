@@ -18,11 +18,9 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const CONFIG = require('dotenv').config().parsed;
+const PRIVATE_KEYS = JSON.parse(CONFIG.PRIVATE_KEYS)
 
 module.exports = {
   /**
@@ -44,7 +42,7 @@ module.exports = {
     //
     development: {
      host: "127.0.0.1",     // Localhost (default: none)
-     port: 8545,            // Standard Ethereum port (default: none)
+     port: 7545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
     },
 
@@ -60,14 +58,13 @@ module.exports = {
 
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
-    // ropsten: {
-      // provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/YOUR-PROJECT-ID`),
-      // network_id: 3,       // Ropsten's id
-      // gas: 5500000,        // Ropsten has a lower block limit than mainnet
-      // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
-      // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-      // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-    // },
+    ropsten: {
+      provider: () => new HDWalletProvider(PRIVATE_KEYS, `https://ropsten.infura.io/v3/${CONFIG.INFURA_KEY}`),
+      network_id: 3,
+      gasPrice: 20000000000,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
 
     // Useful for private networks
     // private: {
@@ -81,7 +78,6 @@ module.exports = {
   mocha: {
     // timeout: 100000
   },
-  plugins: ["solidity-coverage"],
   // Configure your compilers
   compilers: {
     solc: {
@@ -94,5 +90,12 @@ module.exports = {
         }
       }
     }
+  },
+  plugins: [
+    'solidity-coverage',
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: CONFIG.ETHERSCAN_KEY
   }
 }
